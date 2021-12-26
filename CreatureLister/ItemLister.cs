@@ -6,15 +6,11 @@ using Jotunn.Managers;
 
 namespace CreatureLister {
     public class ItemModel {
-        public ItemModel(HitData.DamageTypes damageTypes, float armor, float block) {
+        public ItemModel(HitData.DamageTypes damageTypes) {
             DamageTypes = damageTypes;
-            Armor = armor;
-            Block = block;
         }
 
         [UsedImplicitly] public readonly HitData.DamageTypes DamageTypes;
-        [UsedImplicitly] public readonly float Armor;
-        [UsedImplicitly] public readonly float Block;
         public int Weight;
     }
 
@@ -44,7 +40,7 @@ namespace CreatureLister {
                     case ItemDrop.ItemData.ItemType.Utility:
                     // does block
                     case ItemDrop.ItemData.ItemType.Shield:
-                        result = new ItemModel(itemCommon.m_damages, itemCommon.m_armor, itemCommon.m_blockPower);
+                        result = new ItemModel(itemCommon.m_damages);
                         break;
                     // ignore the rest
                     case ItemDrop.ItemData.ItemType.Tool:

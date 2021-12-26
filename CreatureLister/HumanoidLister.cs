@@ -10,23 +10,23 @@ using YamlDotNet.Serialization.NamingConventions;
 using Logger = Jotunn.Logger;
 
 namespace CreatureLister {
-
     public class HumanoidModel {
         public HumanoidModel(string internalName, Character.Faction faction, string group, float health,
             HitData.DamageModifiers damageModifiers, string defeatSetGlobalKey,
             Dictionary<string, ItemModel> defaultItems,
-            Dictionary<string, ItemModel> randomWeapons, Dictionary<string, ItemModel> randomArmors,
-            Dictionary<string, ItemModel> randomShields) {
+            Dictionary<string, ItemModel> randomWeapons) {
             InternalName = internalName;
             Faction = faction;
             Group = group;
             Health = health;
             DamageModifiers = damageModifiers;
             DefeatSetGlobalKey = defeatSetGlobalKey;
-            DefaultItems = defaultItems;
-            RandomWeapons = randomWeapons;
-            RandomArmors = randomArmors;
-            RandomShields = randomShields;
+            List<KeyValuePair<string, ItemModel>> allWeaponsWithDamage =
+                // ReSharper disable once PossiblyImpureMethodCallOnReadonlyVariable
+                defaultItems.Concat(randomWeapons).Where(pair => pair.Value.DamageTypes.GetTotalDamage() > 0).ToList();
+            AverageDamageTypes = AggregateWeaponDamage(allWeaponsWithDamage);
+            AverageTotalDamage = AverageDamageTypes?.GetTotalDamage() ?? 0f;
+            AllItemNamesContributingToDamage = allWeaponsWithDamage.Select(pair => pair.Key).ToList();
         }
 
         [UsedImplicitly] public readonly string InternalName;
@@ -35,10 +35,23 @@ namespace CreatureLister {
         [UsedImplicitly] public readonly float Health;
         [UsedImplicitly] public readonly HitData.DamageModifiers DamageModifiers;
         [UsedImplicitly] public readonly string DefeatSetGlobalKey;
-        [UsedImplicitly] public readonly Dictionary<string, ItemModel> DefaultItems;
-        [UsedImplicitly] public readonly Dictionary<string, ItemModel> RandomWeapons;
-        [UsedImplicitly] public readonly Dictionary<string, ItemModel> RandomArmors;
-        [UsedImplicitly] public readonly Dictionary<string, ItemModel> RandomShields;
+        [UsedImplicitly] public readonly HitData.DamageTypes? AverageDamageTypes;
+        [UsedImplicitly] public readonly float AverageTotalDamage;
+        [UsedImplicitly] public readonly List<string> AllItemNamesContributingToDamage;
+
+        private static HitData.DamageTypes? AggregateWeaponDamage(List<KeyValuePair<string, ItemModel>> allWeapons) {
+            int numberWeaponsWithDamage = allWeapons.Count;
+            if (numberWeaponsWithDamage == 0) return null;
+            var weightedDamage = allWeapons.Select(pair => {
+                var pureDmg = pair.Value.DamageTypes;
+                pureDmg.Modify(pair.Value.Weight / (float) numberWeaponsWithDamage);
+                return pureDmg;
+            }).ToList();
+            return weightedDamage.Aggregate((a, b) => {
+                a.Add(b);
+                return a;
+            });
+        }
     }
 
     public static class HumanoidLister {
@@ -51,7 +64,8 @@ namespace CreatureLister {
         public static void WriteData() {
             var yamlContent = new SerializerBuilder()
                 .DisableAliases()
-                .WithNamingConvention(CamelCaseNamingConvention.Instance).Build()
+                .WithNamingConvention(CamelCaseNamingConvention.Instance)
+                .Build()
                 .Serialize(ListHumanoids());
             File.WriteAllText(DefaultFile, yamlContent);
             Logger.LogInfo($"wrote yaml content to file '{DefaultFile}'");
@@ -72,10 +86,8 @@ namespace CreatureLister {
                 string defeatSetGlobalKey = pair.Value.m_defeatSetGlobalKey;
                 Dictionary<string, ItemModel> defaultItems = ExtractItemList(pair.Value.m_defaultItems);
                 Dictionary<string, ItemModel> randomWeapons = ExtractItemList(pair.Value.m_randomWeapon);
-                Dictionary<string, ItemModel> randomArmors = ExtractItemList(pair.Value.m_randomArmor);
-                Dictionary<string, ItemModel> randomShields = ExtractItemList(pair.Value.m_randomShield);
                 return new HumanoidModel(internalName, faction, group, health, damageModifiers,
-                    defeatSetGlobalKey, defaultItems, randomWeapons, randomArmors, randomShields);
+                    defeatSetGlobalKey, defaultItems, randomWeapons);
             });
             return output;
         }
