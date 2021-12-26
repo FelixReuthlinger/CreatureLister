@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using BepInEx;
@@ -11,10 +10,13 @@ using YamlDotNet.Serialization.NamingConventions;
 using Logger = Jotunn.Logger;
 
 namespace CreatureLister {
+
     public class HumanoidModel {
         public HumanoidModel(string internalName, Character.Faction faction, string group, float health,
-            HitData.DamageModifiers damageModifiers, string defeatSetGlobalKey, List<string> defaultItems,
-            List<string> randomWeapons, List<string> randomArmors, List<string> randomShields) {
+            HitData.DamageModifiers damageModifiers, string defeatSetGlobalKey,
+            Dictionary<string, ItemModel> defaultItems,
+            Dictionary<string, ItemModel> randomWeapons, Dictionary<string, ItemModel> randomArmors,
+            Dictionary<string, ItemModel> randomShields) {
             InternalName = internalName;
             Faction = faction;
             Group = group;
@@ -33,10 +35,10 @@ namespace CreatureLister {
         [UsedImplicitly] public readonly float Health;
         [UsedImplicitly] public readonly HitData.DamageModifiers DamageModifiers;
         [UsedImplicitly] public readonly string DefeatSetGlobalKey;
-        [UsedImplicitly] public readonly List<string> DefaultItems;
-        [UsedImplicitly] public readonly List<string> RandomWeapons;
-        [UsedImplicitly] public readonly List<string> RandomArmors;
-        [UsedImplicitly] public readonly List<string> RandomShields;
+        [UsedImplicitly] public readonly Dictionary<string, ItemModel> DefaultItems;
+        [UsedImplicitly] public readonly Dictionary<string, ItemModel> RandomWeapons;
+        [UsedImplicitly] public readonly Dictionary<string, ItemModel> RandomArmors;
+        [UsedImplicitly] public readonly Dictionary<string, ItemModel> RandomShields;
     }
 
     public static class HumanoidLister {
@@ -48,6 +50,7 @@ namespace CreatureLister {
 
         public static void WriteData() {
             var yamlContent = new SerializerBuilder()
+                .DisableAliases()
                 .WithNamingConvention(CamelCaseNamingConvention.Instance).Build()
                 .Serialize(ListHumanoids());
             File.WriteAllText(DefaultFile, yamlContent);
@@ -67,18 +70,26 @@ namespace CreatureLister {
                 float health = pair.Value.m_health;
                 HitData.DamageModifiers damageModifiers = pair.Value.m_damageModifiers;
                 string defeatSetGlobalKey = pair.Value.m_defeatSetGlobalKey;
-                List<string> defaultItems = ExtractItemNameList(pair.Value.m_defaultItems);
-                List<string> randomWeapons = ExtractItemNameList(pair.Value.m_randomWeapon);
-                List<string> randomArmors = ExtractItemNameList(pair.Value.m_randomArmor);
-                List<string> randomShields = ExtractItemNameList(pair.Value.m_randomShield);
+                Dictionary<string, ItemModel> defaultItems = ExtractItemList(pair.Value.m_defaultItems);
+                Dictionary<string, ItemModel> randomWeapons = ExtractItemList(pair.Value.m_randomWeapon);
+                Dictionary<string, ItemModel> randomArmors = ExtractItemList(pair.Value.m_randomArmor);
+                Dictionary<string, ItemModel> randomShields = ExtractItemList(pair.Value.m_randomShield);
                 return new HumanoidModel(internalName, faction, group, health, damageModifiers,
                     defeatSetGlobalKey, defaultItems, randomWeapons, randomArmors, randomShields);
             });
             return output;
         }
 
-        private static List<string> ExtractItemNameList(GameObject[] items) {
-            return items.Where(item => item != null).Select(item => item.name).ToList();
+        private static Dictionary<string, ItemModel> ExtractItemList(GameObject[] items) {
+            return items.Where(item => item != null)
+                .GroupBy(item => item.name)
+                .Select(group => new {Name = group.Key, Count = group.Count()})
+                .ToDictionary(item => item.Name,
+                    item => {
+                        var resolvedItem = ItemLister.Items[item.Name];
+                        resolvedItem.Weight = item.Count;
+                        return resolvedItem;
+                    });
         }
     }
 }

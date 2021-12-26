@@ -94,7 +94,8 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="CharacterLister.cs" />
+    <Compile Include="HumanoidLister.cs" />
+    <Compile Include="ItemLister.cs" />
     <Compile Include="Properties\IgnoreAccessModifiers.cs" />
     <Compile Include="CreatureLister.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
