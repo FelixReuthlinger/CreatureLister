@@ -21,12 +21,15 @@ namespace CreatureLister {
             Health = health;
             DamageModifiers = damageModifiers;
             DefeatSetGlobalKey = defeatSetGlobalKey;
+            var allItems = defaultItems.Concat(randomWeapons).ToList();
             List<KeyValuePair<string, ItemModel>> allWeaponsWithDamage =
                 // ReSharper disable once PossiblyImpureMethodCallOnReadonlyVariable
-                defaultItems.Concat(randomWeapons).Where(pair => pair.Value.DamageTypes.GetTotalDamage() > 0).ToList();
+                allItems.Where(pair => pair.Value.DamageTypes.GetTotalDamage() > 0).ToList();
             AverageDamageTypes = AggregateWeaponDamage(allWeaponsWithDamage);
             AverageTotalDamage = AverageDamageTypes?.GetTotalDamage() ?? 0f;
+            AverageTotalDamageToPlayer = AverageDamageTypes?.GetTotalBlockableDamage() ?? 0f;
             AllItemNamesContributingToDamage = allWeaponsWithDamage.Select(pair => pair.Key).ToList();
+            DefaultItemAndRandomWeaponsNames = allItems.Select(pair => pair.Key).ToList();
         }
 
         [UsedImplicitly] public readonly string InternalName;
@@ -37,7 +40,9 @@ namespace CreatureLister {
         [UsedImplicitly] public readonly string DefeatSetGlobalKey;
         [UsedImplicitly] public readonly HitData.DamageTypes? AverageDamageTypes;
         [UsedImplicitly] public readonly float AverageTotalDamage;
+        [UsedImplicitly] public readonly float AverageTotalDamageToPlayer;
         [UsedImplicitly] public readonly List<string> AllItemNamesContributingToDamage;
+        [UsedImplicitly] public readonly List<string> DefaultItemAndRandomWeaponsNames;
 
         private static HitData.DamageTypes? AggregateWeaponDamage(List<KeyValuePair<string, ItemModel>> allWeapons) {
             int numberWeaponsWithDamage = allWeapons.Count;
