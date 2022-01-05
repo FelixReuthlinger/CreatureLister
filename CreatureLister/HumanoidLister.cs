@@ -103,10 +103,19 @@ namespace CreatureLister {
                 .Select(group => new {Name = group.Key, Count = group.Count()})
                 .ToDictionary(item => item.Name,
                     item => {
+                        if (!ItemLister.Items.ContainsKey(item.Name)) {
+                            Logger.LogWarning(
+                                $"item '{item.Name}' wasn't found, probably custom creature is configured with " +
+                                $"an item that doesn't provide 'ItemDrop' component");
+                            return null;
+                        }
+
                         var resolvedItem = ItemLister.Items[item.Name];
                         resolvedItem.Weight = item.Count;
                         return resolvedItem;
-                    });
+                    })
+                .Where(pair => pair.Value != null)
+                .ToDictionary(pair => pair.Key, pair => pair.Value);
         }
     }
 }

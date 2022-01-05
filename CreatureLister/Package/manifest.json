@@ -1,7 +1,7 @@
 ﻿{
   "name": "CreatureLister",
   "description": "For modders only! Lists all creatures and their base resistances and damage values.",
-  "version_number": "0.1.0",
+  "version_number": "0.1.1",
   "website_url": "https://github.com/FelixReuthlinger/CreatureLister",
   "dependencies": [
     "ValheimModding-Jotunn-2.4.5",

@@ -15,7 +15,7 @@ namespace CreatureLister {
     }
 
     public static class ItemLister {
-        public static Dictionary<string, ItemModel> Items = ListItems();
+        public static readonly Dictionary<string, ItemModel> Items = ListItems();
 
         private static Dictionary<string, ItemModel> ListItems() {
             Dictionary<string, ItemDrop> items = PrefabManager.Cache.GetPrefabs(typeof(ItemDrop))

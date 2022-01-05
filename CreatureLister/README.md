@@ -82,8 +82,16 @@ Greydwarf_Shaman:
   - Greydwarf_shaman_heal
 ```
 
+## Incompatible mods
+
+You will still be able to run this mod with the incompatible mods, but the results for the creatures of these mods will
+be invalid.
+
+* RRRMonsters -> does contain some creatures that have not vanilla complaint creature attacks
+
 ## Changelog
 
+* 0.1.1 -> fix for RRRMonsters, since it does contain some creatures that have not vanilla complaint creature attacks
 * 0.1.0 -> initial release
 
 ## Contact
