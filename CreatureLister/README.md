@@ -1,4 +1,4 @@
-﻿# Creature Lister
+# Creature Lister
 
 Will help you creating a list of creatures with their configured base values. This mod is thought to be used by modders
 only, since it will not change anything about the game. It does only provide a new console command to run the mod and
@@ -91,6 +91,7 @@ be invalid.
 
 ## Changelog
 
+* 1.0.0 -> update for Valheim version 0.216.9 and Jotunn 2.12
 * 0.1.1 -> fix for RRRMonsters, since it does contain some creatures that have not vanilla complaint creature attacks
 * 0.1.0 -> initial release
 

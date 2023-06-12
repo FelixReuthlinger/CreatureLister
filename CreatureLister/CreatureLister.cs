@@ -9,7 +9,7 @@ namespace CreatureLister {
     internal class CreatureListerPlugin : BaseUnityPlugin {
         public const string PluginGuid = "org.bepinex.plugins.creature.lister";
         public const string PluginName = "CreatureLister";
-        public const string PluginVersion = "0.1.0";
+        public const string PluginVersion = "1.0.0";
 
         private void Awake() {
             CommandManager.Instance.AddConsoleCommand(new CreatureListerController());
