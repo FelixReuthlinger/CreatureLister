@@ -50,7 +50,7 @@ namespace CreatureLister {
                     case ItemDrop.ItemData.ItemType.Material:
                     case ItemDrop.ItemData.ItemType.Misc:
                     case ItemDrop.ItemData.ItemType.None:
-                    case ItemDrop.ItemData.ItemType.Trophie:
+                    case ItemDrop.ItemData.ItemType.Trophy:
                         break;
                     default:
                         throw new ArgumentOutOfRangeException($"item type '{itemCommon.m_itemType}' not supported");
