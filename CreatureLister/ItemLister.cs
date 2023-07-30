@@ -4,9 +4,12 @@ using System.Linq;
 using JetBrains.Annotations;
 using Jotunn.Managers;
 
-namespace CreatureLister {
-    public class ItemModel {
-        public ItemModel(HitData.DamageTypes damageTypes) {
+namespace CreatureLister
+{
+    public class ItemModel
+    {
+        public ItemModel(HitData.DamageTypes damageTypes)
+        {
             DamageTypes = damageTypes;
         }
 
@@ -14,23 +17,28 @@ namespace CreatureLister {
         public int Weight;
     }
 
-    public static class ItemLister {
+    public static class ItemLister
+    {
         public static readonly Dictionary<string, ItemModel> Items = ListItems();
 
-        private static Dictionary<string, ItemModel> ListItems() {
+        private static Dictionary<string, ItemModel> ListItems()
+        {
             Dictionary<string, ItemDrop> items = PrefabManager.Cache.GetPrefabs(typeof(ItemDrop))
-                .ToDictionary(pair => pair.Key, pair => (ItemDrop) pair.Value);
+                .ToDictionary(pair => pair.Key, pair => (ItemDrop)pair.Value);
 
-            return items.ToDictionary(pair => pair.Key, pair => {
+            return items.ToDictionary(pair => pair.Key, pair =>
+            {
                 ItemDrop.ItemData.SharedData itemCommon = pair.Value.m_itemData.m_shared;
                 ItemModel result = null;
-                switch (itemCommon.m_itemType) {
+                switch (itemCommon.m_itemType)
+                {
                     // does damage
                     case ItemDrop.ItemData.ItemType.Bow:
                     case ItemDrop.ItemData.ItemType.OneHandedWeapon:
                     case ItemDrop.ItemData.ItemType.TwoHandedWeapon:
                     case ItemDrop.ItemData.ItemType.Torch:
                     case ItemDrop.ItemData.ItemType.Attach_Atgeir:
+                    case ItemDrop.ItemData.ItemType.TwoHandedWeaponLeft:
                     // does protect
                     case ItemDrop.ItemData.ItemType.Chest:
                     case ItemDrop.ItemData.ItemType.Hands:
@@ -51,6 +59,8 @@ namespace CreatureLister {
                     case ItemDrop.ItemData.ItemType.Misc:
                     case ItemDrop.ItemData.ItemType.None:
                     case ItemDrop.ItemData.ItemType.Trophy:
+                    case ItemDrop.ItemData.ItemType.Fish:
+                    case ItemDrop.ItemData.ItemType.AmmoNonEquipable:
                         break;
                     default:
                         throw new ArgumentOutOfRangeException($"item type '{itemCommon.m_itemType}' not supported");

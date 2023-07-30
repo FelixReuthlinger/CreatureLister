@@ -91,6 +91,7 @@ be invalid.
 
 ## Changelog
 
+* 1.0.1 & .2 -> added missing new item types
 * 1.0.0 -> update for Valheim version 0.216.9 and Jotunn 2.12
 * 0.1.1 -> fix for RRRMonsters, since it does contain some creatures that have not vanilla complaint creature attacks
 * 0.1.0 -> initial release
